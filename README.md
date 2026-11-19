@@ -1,47 +1,66 @@
-# 🏛️ Omyxia Portal Shell (`omyxia-portal-shell`)
+# Omyxia Portal Shell & Central App Launcher 🌐
 
-> **Repository:** [open-uppu/omyxia-portal-shell](https://github.com/open-uppu/omyxia-portal-shell)  
-> **Role:** Central Micro-frontend Host, App Launcher & Unified Tenant Portal  
-> **Version:** 1.0.0  
-> **License:** AGPL-3.0  
+Central Host Application for the **Omyxia Enterprise Microservices Ecosystem** (`open-uppu`).
 
-Omyxia Portal Shell is the central master application that aggregates and orchestrates all Omyxia enterprise microservices into a single, cohesive user experience.
+Provides unified authentication, plan entitlement gating, dynamic application launching, and embedded micro-frontend routing for all 14 Omyxia systems.
 
 ---
 
-## 🌟 Core Capabilities
+## 🏛️ Architecture Overview
 
-1. **Unified App Launcher (เหมือน Google Workspace / Microsoft 365 Hub):**
-   * รวบรวมทุก Service ของ Omyxia (HRM, ERP, CRM, WMS, BI, Workspace ฯลฯ) ไว้ในหน้า Launcher เดียว
-   * รองรับการคลิกเลือกสลับการใช้งานระหว่างแอปได้อย่างไร้รอยต่อ
-2. **Dynamic Subscription Entitlement Gating:**
-   * ตรวจสอบสิทธิ์ของ Tenant อัตโนมัติ (Free, Starter, Pro, Enterprise, Add-ons)
-   * แอปที่มีสิทธิ์จะแสดงปุ่ม **"เปิดใช้งาน (Launch App)"**
-   * แอปที่อยู่นอกแพ็กเกจจะติดสถานะ **"ล็อก (Locked)"** พร้อมแสดงหน้าต่าง Paywall / Upgrade Modal เพื่อชวนอัปเกรด
-3. **Micro-frontend Remote Mounting:**
-   * โหลด UI จากแต่ละ Microservice เข้ามาแสดงผลภายใน Shell ร่วมกัน โดยยังคงแถบ Header, Tenant Switcher และระบบแจ้งเตือนไว้
-
----
-
-## 🚀 Quick Start
-
-```bash
-# 1. Install dependencies
-pnpm install
-
-# 2. Start Portal Shell on port 3000
-pnpm dev
+```
+                          [ Client Browser ]
+                                   │
+                                   ▼
+         [ Central Portal Shell :3000 ] (open-uppu/omyxia-portal-shell)
+         ├── App Launcher Grid (14 Services Catalog)
+         ├── Dynamic Entitlement Gate (FREE / STARTER / PRO / ENTERPRISE)
+         ├── Real-time Plan Simulator & Paywall Modal
+         └── Micro-frontend Host Container
+                                   │
+       ┌───────────────────────────┼───────────────────────────┐
+       ▼                           ▼                           ▼
+[ HRM Microservice ]       [ ERP Microservice ]        [ CRM Microservice ]
+:3001 UI / :4001 API       :3002 UI / :4002 API        :3003 UI / :4003 API
+Database: omyxia_hrm       Database: omyxia_erp        Database: omyxia_crm
+(omyxia-service-hrm)       (omyxia-service-erp)        (omyxia-service-crm)
 ```
 
 ---
 
-## 🗺️ Microservices Registry & Ports
+## 🚀 Live Microservices Repositories
 
-| Service ID | Display Name | Backend Port | Frontend / Remote Port | Required Plan |
-|---|---|:---:|:---:|:---:|
-| `hrm` | Human Resource Management | `:4001` | `:3001` | Starter |
-| `erp` | Enterprise Financials & Tax | `:4002` | `:3002` | Pro |
-| `crm` | Customer Relations & Pipeline | `:4003` | `:3003` | Starter |
-| `wms` | Warehouse & Inventory | `:4004` | `:3004` | Enterprise |
-| `analytics` | BI Dashboards & KPIs | `:4005` | `:3005` | Starter (Basic) / Pro |
-| `workspace` | Chat, Email & Files | `:4006` | `:3006` | Free / Included |
+| Microservice | GitHub Repository | Frontend | Backend | Database | Min Tier |
+| :--- | :--- | :---: | :---: | :---: | :---: |
+| **Central Shell** | [`open-uppu/omyxia-portal-shell`](https://github.com/open-uppu/omyxia-portal-shell) | `:3000` | Host | Portal Cache | `FREE` |
+| **HRM & Payroll** | [`open-uppu/omyxia-service-hrm`](https://github.com/open-uppu/omyxia-service-hrm) | `:3001` | `:4001` | `omyxia_hrm` | `STARTER` |
+| **ERP & Accounting** | [`open-uppu/omyxia-service-erp`](https://github.com/open-uppu/omyxia-service-erp) | `:3002` | `:4002` | `omyxia_erp` | `PRO` |
+| **CRM & Pipeline** | [`open-uppu/omyxia-service-crm`](https://github.com/open-uppu/omyxia-service-crm) | `:3003` | `:4003` | `omyxia_crm` | `STARTER` |
+| **Core Monolith** | [`open-uppu/Omyxia`](https://github.com/open-uppu/Omyxia) | `:3000` | `:4000` | Blueprint | All |
+
+---
+
+## 💡 Key Features
+
+1. **App Launcher Grid:**
+   * Lists all 14 enterprise services across HR, Finance, Operations, Collaboration, and Governance.
+   * Dynamically unlocks entitled apps with a direct "เปิดใช้งานแอป (Launch App)" button.
+   * Locks unentitled apps with a "ล็อก - ดูเงื่อนไข (Locked)" badge and triggers the Upgrade Paywall Modal.
+2. **Interactive Plan Simulator:**
+   * Switch between `FREE`, `STARTER`, `PRO`, and `ENTERPRISE` tiers in real-time on the navbar to simulate tenant subscription entitlements.
+3. **Workspace Embedded Preview:**
+   * Embedded live preview & standalone tabs for decoupled microservices (`hrm` on 3001, `erp` on 3002, `crm` on 3003).
+   * Direct links to respective GitHub repositories.
+
+---
+
+## 🛠️ Local Development
+
+```bash
+# Install dependencies
+pnpm install
+
+# Run Portal Shell
+pnpm dev
+# Open http://localhost:3000
+```

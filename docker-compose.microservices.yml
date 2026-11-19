@@ -1,0 +1,57 @@
+version: '3.8'
+
+services:
+  # -------------------------------------------------------------
+  # Infrastructure: Shared Databases & Entitlement Cache
+  # -------------------------------------------------------------
+  postgres:
+    image: postgres:16-alpine
+    container_name: omyxia-microservices-postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgrespassword
+      POSTGRES_MULTIPLE_DATABASES: omyxia_hrm,omyxia_erp,omyxia_crm,omyxia_gateway
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: omyxia-microservices-redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  # -------------------------------------------------------------
+  # Central Portal Shell & App Launcher (Host)
+  # -------------------------------------------------------------
+  portal-shell:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: omyxia-portal-shell
+    ports:
+      - "3000:3000"
+    environment:
+      - PORT=3000
+      - NODE_ENV=development
+      - NEXT_PUBLIC_HRM_URL=http://localhost:3001
+      - NEXT_PUBLIC_ERP_URL=http://localhost:3002
+      - NEXT_PUBLIC_CRM_URL=http://localhost:3003
+    depends_on:
+      - postgres
+      - redis
+
+volumes:
+  pgdata:
+    driver: local
